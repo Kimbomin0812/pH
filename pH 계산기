@@ -1,0 +1,70 @@
+import math
+
+def ab_input(ab, right_input):
+    while True:
+        value = input(ab).strip()
+        if value in right_input:
+            return value
+        else:
+            print('잘못된 형식입니다. 형식에 맞게 다시 입력해주세요')
+
+def nmv_input(nmv):
+    while True:
+        try:
+            return float(input(nmv).strip())
+        except ValueError:
+            print('숫자를 입력해주세요')
+
+def calculate_pH():
+    print('---중화반응 후 pH 계산기(약산, 약염기의 중화반응은 포함되어있지 않습니다.)---')
+    while True:
+        acid = ab_input('산의 종류를 입력해주세요(강산/약산):', ['강산', '약산'])
+        base = ab_input('염기의 종류를 입력해주세요(강염기/약염기):', ['강염기', '약염기'])
+        if acid == '약산' and base == '약염기':
+            print('해당 계산기에서 약산과 약염기 중화 시의 pH 계산은 포함되어있지 않습니다. 다른 조합을 입력해주세요')
+        else:
+            break
+    M_acid = nmv_input('산의 몰농도를 입력해주세요:')
+    V_acid = nmv_input('산의 부피를 입력해주세요(mL):')
+    N_acid = nmv_input('산의 가수를 입력해주세요:')
+    mol_acid = M_acid*V_acid*N_acid/1000
+    M_base = nmv_input('염기의 몰농도를 입력해주세요:')
+    V_base = nmv_input('염기의 부피를 입력해주세요(mL):')
+    N_base = nmv_input('염기의 가수를 입력해주세요:')
+    mol_base = M_base*V_base*N_base/1000
+    if acid == '약산':
+        ka = nmv_input('산의 ka를 입력해주세요:')
+    if base == '약염기':
+        kb = nmv_input('염기의 kb를 입력해주세요:')
+    total_L = (V_acid + V_base) / 1000
+    if acid == '강산' and base == '강염기':
+        if mol_acid == mol_base:
+            pH = 7
+        elif mol_acid > mol_base:
+            pH = -math.log10((mol_acid-mol_base)/total_L)
+        else:
+            pH = 14 + math.log10((mol_base-mol_acid)/total_L)
+    elif acid == '약산' and base == '강염기':
+        if mol_base > mol_acid:
+            pH = 14 + math.log10((mol_base - mol_acid) / total_L)
+        elif mol_acid > mol_base:
+            pH = -math.log10(ka*((mol_acid - mol_base) / mol_base))
+        else:
+            pH = 14 + math.log10(((1.0e-14/ka)*mol_acid/ total_L)**0.5)
+    else:
+        if mol_acid > mol_base:
+            pH = - math.log10((mol_acid - mol_base) / total_L)
+        elif mol_acid < mol_base:
+            pH = 14 + math.log10(kb) + math.log10((mol_base - mol_acid) / mol_acid)
+        else:
+            pH = -math.log10(((1.0e-14/kb)*mol_base/total_L)**0.5)
+
+    print('25℃에서 중화 반응 후 용액의 pH는 %.2f입니다.'%pH)
+
+while True:
+    ans = ab_input('pH 계산기를 실행하시겠습니까?(Y/N):',['Y', 'y', 'N', 'n'])
+    if ans == 'Y' or ans == 'y':
+        calculate_pH()
+    else:
+        print('계산기를 종료합니다.')
+        break
